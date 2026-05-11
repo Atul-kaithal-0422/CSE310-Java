@@ -559,36 +559,42 @@ CRUD = Create, Read, Update, Delete
 ### CREATE (Insert)
 
 ```java
-public class InsertData {
+import java.sql.*;
+
+public class Main {
     public static void main(String[] args) {
-        String url = "jdbc:mysql://localhost:3306/studentdb";
-        String user = "root";
-        String password = "yourpassword";
-        
-        try (Connection conn = DriverManager.getConnection(url, user, password)) {
-            
-            // Method 1: Using Statement
+
+        String url = "jdbc:mysql://localhost/ri_db";
+        String user = "test";
+        String password = "test123";
+
+        try {
+            Connection conn =
+                DriverManager.getConnection(url, user, password);
+
             Statement stmt = conn.createStatement();
-            String sql = "INSERT INTO students VALUES (1, 'Alice', 20)";
+
+            // Create table
+            stmt.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS students(" +
+                "id INT PRIMARY KEY, " +
+                "name VARCHAR(50), " +
+                "age INT)"
+            );
+
+            // Insert data
+            String sql =
+                "INSERT INTO students(id, name, age) " +
+                "VALUES (1, 'Alice', 20)";
+
             int rows = stmt.executeUpdate(sql);
+
             System.out.println(rows + " row inserted");
-            
-            // Method 2: Using PreparedStatement (recommended)
-            String query = "INSERT INTO students VALUES (?, ?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            
-            pstmt.setInt(1, 2);
-            pstmt.setString(2, "Bob");
-            pstmt.setInt(3, 21);
-            
-            int result = pstmt.executeUpdate();
-            System.out.println(result + " row inserted");
-            
-            pstmt.close();
-            stmt.close();
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
+
+            conn.close();
+
+        } catch(Exception e) {
+            System.out.println(e);
         }
     }
 }
